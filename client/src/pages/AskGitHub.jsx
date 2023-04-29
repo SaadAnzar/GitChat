@@ -1,104 +1,35 @@
 import React, { useState } from 'react'
-import { BsArrowReturnRight } from 'react-icons/bs'
+import { Link } from 'react-router-dom'
 import Chatgpt from '../components/Chatgpt'
-import axios from 'axios'
 
 const AskGitHub = () => {
-  const [input, setInput] = useState('')
-
-  const handleSubmit = (event) => {
-    event.preventDefault()
-
-    axios
-      .post('http://localhost:1212/clone', {
-        URL: input,
-      })
-      .then((res) => {
-        console.log(res)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-  }
+  const [url, setUrl] = useState('')
 
   return (
-    <div className="max-h-screen flex flex-col w-full sm:p-8 p-2">
-      <div className="sm:flex justify-between">
-        <div className="sm:w-[45%] p-2">
-          <div className="bg-gray-gradient m-2 rounded-lg z-1 py-2 drop-shadow-md">
-            <form onSubmit={handleSubmit}>
-              <div className="px-4 py-2 flex items-center">
-                <input
-                  type="text"
-                  value={input}
-                  placeholder="Enter or Paste the GitHub URL here..."
-                  onChange={(event) =>
-                    setInput(
-                      event.target.value.charAt(0).toUpperCase() +
-                        event.target.value.slice(1)
-                    )
-                  }
-                  className="bg-inherit border-none outline-none text-gray-400 w-full placeholder:text-[#707070]"
-                />
-                <button type="submit" className="ml-2 text-gray-300">
-                  <BsArrowReturnRight />
-                </button>
-              </div>
-            </form>
-          </div>
-          <div className="bg-gray-gradient rounded-lg z-1 py-2 mx-2 my-0.5 drop-shadow-md">
-            <div className="px-4 py-2">
-              <div className="bg-inherit border-none outline-none text-gray-400 w-full placeholder:text-[#707070]">
-                <p>
-                  <span className="text-gray-700 font-semibold">Title:</span>{' '}
-                  <span className="text-gray-400">
-                    Title of the GitHub Repo
-                  </span>
-                </p>
-                <p>
-                  <span className="text-gray-700 font-semibold">
-                    Description:
-                  </span>{' '}
-                  <span className="text-gray-400">
-                    Description of the GitHub Repo
-                  </span>
-                </p>
-                <p>
-                  <span className="text-gray-700 font-semibold">Language:</span>{' '}
-                  <span className="text-gray-400">
-                    Language of the GitHub Repo
-                  </span>
-                </p>
-                <p>
-                  <span className="text-gray-700 font-semibold">Stars:</span>{' '}
-                  <span className="text-gray-400">
-                    Stars of the GitHub Repo
-                  </span>
-                </p>
-                <p>
-                  <span className="text-gray-700 font-semibold">Forks:</span>{' '}
-                  <span className="text-gray-400">
-                    Forks of the GitHub Repo
-                  </span>
-                </p>
-                <p>
-                  <span className="text-gray-700 font-semibold">License:</span>{' '}
-                  <span className="text-gray-400">
-                    License of the GitHub Repo
-                  </span>
-                </p>
-                <p>
-                  <span className="text-gray-700 font-semibold">URL:</span>{' '}
-                  <span className="text-gray-400">URL of the GitHub Repo</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="sm:w-[45%] p-2">
-          <Chatgpt />
+    <div className="max-h-screen flex flex-col w-full sm:px-8 sm:py-4 p-2">
+      <div className="flex flex-row gap-x-20 items-center">
+        <h1 className="sm:mx-20 text-xl font-bold text-gray-500 text-center">
+          Enter or Paste the GitHub URL and ask questions regarding it
+        </h1>
+        <Link
+          to="/chatcode"
+          className="px-4 py-2 bg-[#FF9500] text-white rounded-lg"
+        >
+          Chat with Code
+        </Link>
+      </div>
+      <div className="bg-gray-gradient mx-4 mt-2 rounded-lg z-1 py-2 drop-shadow-md">
+        <div className="px-4 py-1 flex items-center">
+          <input
+            type="text"
+            value={url}
+            placeholder="Enter or Paste the GitHub URL here..."
+            onChange={(event) => setUrl(event.target.value)}
+            className="bg-inherit border-none outline-none text-gray-400 w-full placeholder:text-[#707070]"
+          />
         </div>
       </div>
+      <Chatgpt url={url} />
     </div>
   )
 }

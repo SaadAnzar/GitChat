@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
-import { questions } from '../data'
+import { questions2 } from '../data'
 import { BsArrowReturnRight } from 'react-icons/bs'
 import { AiFillDelete } from 'react-icons/ai'
 
-const Chatgpt = ({ code }) => {
+const Chatgpt = ({ url }) => {
   const [input, setInput] = useState('')
   const [chats, setChats] = useState(
     JSON.parse(localStorage.getItem('chats')) || [
@@ -34,10 +34,45 @@ const Chatgpt = ({ code }) => {
     event.preventDefault()
 
     setChats([...chats, { message: input, author: 'user' }])
+
+    axios
+      .post('http://localhost:1212/clone', {
+        prompt: input,
+        url,
+      })
+      .then((res) => {
+        const Answer = res.data.answer
+        setChats([
+          ...chats,
+          { message: input, author: 'user' },
+          { message: Answer, author: 'bot' },
+        ])
+        setInput('')
+      })
+      .catch((error) => {
+        console.log(error)
+      })
   }
 
   const handleQuestionClick = (question) => {
     setChats([...chats, { message: question, author: 'user' }])
+
+    axios
+      .post('http://localhost:1212/clone', {
+        prompt: question,
+        url,
+      })
+      .then((res) => {
+        const Answer = res.data.answer
+        setChats([
+          ...chats,
+          { message: question, author: 'user' },
+          { message: Answer, author: 'bot' },
+        ])
+      })
+      .catch((error) => {
+        console.log(error)
+      })
   }
 
   return (
@@ -67,7 +102,7 @@ const Chatgpt = ({ code }) => {
       </div>
 
       <div className="flex flex-col">
-        {questions.map((question, index) => (
+        {questions2.map((question, index) => (
           <button
             key={index}
             onClick={() => handleQuestionClick(question.question)}

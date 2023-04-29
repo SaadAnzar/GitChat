@@ -9,3 +9,10 @@ export const questions = [
     question: 'Write the code more effieciently.',
   },
 ]
+
+
+export const questions2 = [
+  {question: 'What are the packages installed?'},
+  {question: 'What is the purpose of this code?'},
+  {question: 'What is the objective of this repository?'},
+]

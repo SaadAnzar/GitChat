@@ -2,8 +2,10 @@
 import os
 import openai
 import git
-from flask import Flask, request, session
-from flask_cors import CORS
+import random
+import string
+from flask import Flask, request
+from flask_cors import CORS, cross_origin
 from dotenv import load_dotenv
 from langchain.embeddings import CohereEmbeddings
 from langchain.document_loaders import TextLoader
@@ -23,25 +25,32 @@ embeddings = CohereEmbeddings()
 
 app = Flask(__name__)
 CORS(app,)
+app.secret_key = 'your_secret_key_here'
 
 
+@cross_origin(supports_credentials=True)
 @app.route('/', methods=['POST', 'GET'])
 def home():
     return 'Flask is up and running!'
 
-
+@cross_origin(supports_credentials=True)
 @app.route('/clone', methods=['POST', 'GET'])
 def clone_and_index():
-
     # URL of the repository to clone
     repo_url = request.json['url'] if request.json['url'] else ''
+    question = request.json['prompt'] if request.json['prompt'] else ''
+
+    print("THIS IS URL", repo_url)
     # Local directory where the repository will be cloned
-    local_dir = "repo"
+    local_dir =  ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    print(local_dir)
+    print("THIS IS LOCAL DIR", local_dir)
     # Clone the repository
     git.Repo.clone_from(repo_url, local_dir)
 
     # traversing the directory tree
-    root_dir = './repo'
+    root_dir = (f'./{local_dir}')
+    print(root_dir)
     docs = []
     for dirpath, dirnames, filenames in os.walk(root_dir):
         for file in filenames:
@@ -58,12 +67,12 @@ def clone_and_index():
 
     # performing indexing (caluculating embeddings and upserting to ActiveLoop)
     username = 'mdarshad1000'
-    db = DeepLake(dataset_path=f'hub://{username}/pf', embedding_function=embeddings)
+    db = DeepLake(dataset_path=f'hub://{username}/{local_dir}', embedding_function=embeddings)
     db.add_documents(texts)
 
     # load dataset, establish retreiver, create conversational chain
-    db = DeepLake(dataset_path=f'hub://{username}/pf', read_only=True, embedding_function=embeddings)
-    print(type(db))
+    db = DeepLake(dataset_path=f'hub://{username}/{local_dir}', read_only=True, embedding_function=embeddings)
+
 
     retriever = db.as_retriever()
     retriever.search_kwargs['distance_metric'] = 'cos'
@@ -79,18 +88,13 @@ def clone_and_index():
 
     model = ChatOpenAI(model='gpt-3.5-turbo')
     qa = ConversationalRetrievalChain.from_llm(model, retriever=retriever)
-
-    return {"qa":qa}
-
-@app.route('/message', methods=['POST', 'GET'])
-def message():
-
-    message = request.json['message'] if request.json['message'] else ''
-    qa = request.json['qa'] if request.json['qa'] else ''
+    
     chat_history = []
-    result = qa({"question":message, "chat_history":chat_history})
-    chat_history.append((message, result['answer']))
+    result = qa({"question":question, "chat_history":chat_history})
+    chat_history.append((question, result['answer']))
+
     return {"answer":result['answer']}
+
 
 
 if __name__ == '__main__':

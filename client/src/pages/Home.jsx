@@ -5,13 +5,13 @@ const Home = () => {
   return (
     <div className="h-screen">
       <div className="flex flex-col justify-center items-center h-full">
-        <div className="text-4xl font-bold">Welcome to CodeBot</div>
+        <div className="text-4xl font-bold">Welcome to GitChat</div>
         <div className="text-2xl font-medium mt-4">
-          A chatbot that helps you with your code
+          Understand Github Repos like never before!
         </div>
         <div className="mt-8">
           <Link
-            to="/chatcode"
+            to="/ask-github"
             className="px-4 py-2 bg-[#FF9500] text-white rounded-lg"
           >
             Get Started

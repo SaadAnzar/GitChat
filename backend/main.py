@@ -65,7 +65,6 @@ qa = ConversationalRetrievalChain.from_llm(model, retriever=retriever)
 questions = [
     "what are the packages imported?",
     "What does the chat function do?",
-    "what does get_pdf function do"
 ]
 
 chat_history = []
