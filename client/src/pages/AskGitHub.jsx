@@ -1,16 +1,32 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BsArrowReturnRight } from 'react-icons/bs'
 import Chatgpt from '../components/Chatgpt'
+import axios from 'axios'
 
 const AskGitHub = () => {
-  const [input, setInput] = React.useState('')
+  const [input, setInput] = useState('')
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+
+    axios
+      .post('http://localhost:1212/clone', {
+        URL: input,
+      })
+      .then((res) => {
+        console.log(res)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
 
   return (
     <div className="max-h-screen flex flex-col w-full sm:p-8 p-2">
       <div className="sm:flex justify-between">
         <div className="sm:w-[45%] p-2">
           <div className="bg-gray-gradient m-2 rounded-lg z-1 py-2 drop-shadow-md">
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="px-4 py-2 flex items-center">
                 <input
                   type="text"
