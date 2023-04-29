@@ -80,22 +80,17 @@ def clone_and_index():
     model = ChatOpenAI(model='gpt-3.5-turbo')
     qa = ConversationalRetrievalChain.from_llm(model, retriever=retriever)
 
-    return qa
+    return {"qa":qa}
 
 @app.route('/message', methods=['POST', 'GET'])
 def message():
-    if request.method == 'POST':
-        def filter(x):
-            if 'com.google' in x['text'].data()['value']:
-                return False
-            metadata = x['metadata'].data()['value']
-            return 'scala' in metadata['source'] or 'py' in metadata['source']
 
-
-        model = ChatOpenAI(model='gpt-3.5-turbo')
-        qa = ConversationalRetrievalChain.from_llm(model, retriever=retriever)
-
-
+    message = request.json['message'] if request.json['message'] else ''
+    qa = request.json['qa'] if request.json['qa'] else ''
+    chat_history = []
+    result = qa({"question":message, "chat_history":chat_history})
+    chat_history.append((message, result['answer']))
+    return {"answer":result['answer']}
 
 
 if __name__ == '__main__':
